@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de Gestión y Asignación de Casos de Soporte Técnico (HelpDesk ITSM) — Plataforma centralizada para la recepción, clasificación, asignación y trazabilidad de incidentes informáticos corporativos.">
+  <meta name="author" content="Camilo Andrés Valderrama Alzate">
+  <title>HelpDesk ITSM v3.0 — Mesa de Ayuda</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       LOGIN VIEW
+  ════════════════════════════════════════════════════════ -->
+  <div id="login-view" class="login-view">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-logo">🎧</div>
+        <h2>HelpDesk ITSM</h2>
+        <p>Sistema de Gestión de Soporte Técnico v3.0</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Correo Electrónico</label>
+          <input type="email" class="form-control" id="login-email" placeholder="usuario@empresa.co" value="carlos@empresa.co" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input type="password" class="form-control" id="login-password" placeholder="••••••••" value="admin123" required>
+        </div>
+        <div class="form-error-msg" id="login-error">Credenciales inválidas. Verifique su correo y contraseña.</div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:var(--space-4)">
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div style="margin-top:var(--space-6); padding-top:var(--space-5); border-top:1px solid var(--border-subtle)">
+        <p style="font-size:var(--text-xs); color:var(--text-tertiary); text-align:center; margin-bottom:var(--space-3)">Cuentas de demostración:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-2); font-size:var(--text-xs)">
+          <div style="color:var(--text-tertiary)">
+            <div><strong style="color:var(--text-secondary)">Supervisor:</strong></div>
+            <div>carlos@empresa.co</div>
+          </div>
+          <div style="color:var(--text-tertiary)">
+            <div><strong style="color:var(--text-secondary)">Coordinador:</strong></div>
+            <div>ana@empresa.co</div>
+          </div>
+          <div style="color:var(--text-tertiary)">
+            <div><strong style="color:var(--text-secondary)">Agente N1:</strong></div>
+            <div>luis@empresa.co</div>
+          </div>
+          <div style="color:var(--text-tertiary)">
+            <div><strong style="color:var(--text-secondary)">Usuario:</strong></div>
+            <div>valentina@corp.co / user123</div>
+          </div>
+        </div>
+        <p style="font-size:var(--text-xs); color:var(--text-tertiary); text-align:center; margin-top:var(--space-3)">Contraseña admin: <code style="color:var(--accent-hover)">admin123</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       APP SHELL
+  ════════════════════════════════════════════════════════ -->
+  <div id="app-shell" style="display:none">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🎧</div>
+        <div>
+          <h1>HelpDesk</h1>
+          <span class="brand-version">ITSM v3.0</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+
+        <div class="nav-item active" data-view="dashboard" data-role-required="all">
+          <span class="nav-icon">📊</span>
+          <span>Panel de Control</span>
+        </div>
+
+        <div class="nav-item" data-view="new-ticket" data-role-required="all">
+          <span class="nav-icon">📝</span>
+          <span>Nuevo Ticket</span>
+        </div>
+
+        <div class="nav-item" data-view="tickets" data-role-required="all">
+          <span class="nav-icon">📋</span>
+          <span>Gestión de Tickets</span>
+          <span class="nav-badge" id="nav-badge-tickets">0</span>
+        </div>
+
+        <div class="nav-section-title" data-role-required="admin,agent">Operaciones</div>
+
+        <div class="nav-item" data-view="assignment" data-role-required="admin,agent">
+          <span class="nav-icon">🔄</span>
+          <span>Motor Asignación</span>
+        </div>
+
+        <div class="nav-item" data-view="sla" data-role-required="admin,agent">
+          <span class="nav-icon">⏱️</span>
+          <span>Monitor SLA</span>
+          <span class="nav-badge" id="nav-badge-sla" style="display:none">0</span>
+        </div>
+
+        <div class="nav-item" data-view="batch" data-role-required="admin">
+          <span class="nav-icon">🗃️</span>
+          <span>Depuración Auto.</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user" onclick="App.logout()">
+          <div class="user-avatar" id="current-user-avatar">CM</div>
+          <div class="user-info">
+            <div class="user-name" id="current-user-name">Carlos Martínez</div>
+            <div class="user-role" id="current-user-role">Supervisor</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main-content">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h2 id="page-title">Panel de Control</h2>
+        </div>
+        <div class="header-right">
+          <div class="header-clock">
+            <span id="header-clock-time">—</span>
+            <span class="sla-window-status">
+              <span class="sla-dot" id="sla-window-dot"></span>
+              <span id="sla-window-label">—</span>
+            </span>
+          </div>
+          <button class="icon-btn" title="Notificaciones">
+            🔔
+            <span class="notification-dot"></span>
+          </button>
+          <button class="icon-btn" title="Cerrar Sesión" onclick="App.logout()">🚪</button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page-content">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <div id="view-dashboard" class="view-container active">
+          <div class="stats-grid">
+            <div class="stat-card accent">
+              <div class="stat-header">
+                <span class="stat-label">Total Tickets</span>
+                <div class="stat-icon">📋</div>
+              </div>
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-trend up">Acumulado general</div>
+            </div>
+            <div class="stat-card info">
+              <div class="stat-header">
+                <span class="stat-label">Abiertos</span>
+                <div class="stat-icon">📬</div>
+              </div>
+              <div class="stat-value" id="stat-open">0</div>
+              <div class="stat-trend">Pendientes de atención</div>
+            </div>
+            <div class="stat-card warning">
+              <div class="stat-header">
+                <span class="stat-label">En Progreso</span>
+                <div class="stat-icon">⚡</div>
+              </div>
+              <div class="stat-value" id="stat-progress">0</div>
+              <div class="stat-trend">Bajo tratamiento activo</div>
+            </div>
+            <div class="stat-card danger">
+              <div class="stat-header">
+                <span class="stat-label">Escalados</span>
+                <div class="stat-icon">🔺</div>
+              </div>
+              <div class="stat-value" id="stat-escalated">0</div>
+              <div class="stat-trend">Derivados a Nivel 2</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-header">
+                <span class="stat-label">Resueltos / Cerrados</span>
+                <div class="stat-icon">✅</div>
+              </div>
+              <div class="stat-value" id="stat-resolved">0</div>
+              <div class="stat-trend up">Casos concluidos</div>
+            </div>
+            <div class="stat-card accent">
+              <div class="stat-header">
+                <span class="stat-label">FCR</span>
+                <div class="stat-icon">🎯</div>
+              </div>
+              <div class="stat-value" id="stat-fcr">0%</div>
+              <div class="stat-trend">First Contact Resolution</div>
+            </div>
+            <div class="stat-card info">
+              <div class="stat-header">
+                <span class="stat-label">MTTR</span>
+                <div class="stat-icon">⏱️</div>
+              </div>
+              <div class="stat-value" id="stat-mttr">0h</div>
+              <div class="stat-trend">Mean Time to Resolve</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-header">
+                <span class="stat-label">Cumplimiento SLA</span>
+                <div class="stat-icon">📈</div>
+              </div>
+              <div class="stat-value" id="stat-sla">0%</div>
+              <div class="stat-trend">Dentro de ventana hábil</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3>📊 Distribución por Estado</h3>
+              </div>
+              <div class="card-body">
+                <div class="chart-placeholder" id="dashboard-chart"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3>🕐 Actividad Reciente</h3>
+              </div>
+              <div class="card-body" id="dashboard-activity" style="max-height:340px; overflow-y:auto">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ NEW TICKET (HU-001) ═══ -->
+        <div id="view-new-ticket" class="view-container">
+          <div class="card" style="max-width:800px">
+            <div class="card-header">
+              <h3>📝 Reportar Contingencia Tecnológica</h3>
+              <span class="badge badge-open">REQ-01 · REQ-02 · REQ-04</span>
+            </div>
+            <div class="card-body" id="new-ticket-form-container">
+              <!-- Form rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TICKETS GRID (HU-006) ═══ -->
+        <div id="view-tickets" class="view-container">
+          <div class="filter-bar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-tickets" placeholder="Buscar por ID o asunto..." oninput="App.navigateTo('tickets')">
+            </div>
+            <select class="filter-select" id="filter-status" onchange="App.navigateTo('tickets')">
+              <option value="all">Todos los estados</option>
+              <option value="Abierto">Abierto</option>
+              <option value="En_Progreso">En Progreso</option>
+              <option value="Escalado">Escalado</option>
+              <option value="Resuelto">Resuelto</option>
+              <option value="Cerrado_Definitivo">Cerrado Definitivo</option>
+            </select>
+            <select class="filter-select" id="filter-severity" onchange="App.navigateTo('tickets')">
+              <option value="all">Todas las severidades</option>
+              <option value="Crítico">Crítico</option>
+              <option value="Alto">Alto</option>
+              <option value="Medio">Medio</option>
+              <option value="Bajo">Bajo</option>
+            </select>
+            <span id="tickets-count" class="text-muted" style="font-size:var(--text-sm)">0 ticket(s)</span>
+          </div>
+
+          <div class="card">
+            <div class="card-body no-padding">
+              <div style="overflow-x:auto">
+                <table class="data-grid">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Asunto / Categoría</th>
+                      <th>Estado</th>
+                      <th>Severidad</th>
+                      <th>SLA</th>
+                      <th>Tipo</th>
+                      <th>Agente</th>
+                      <th>Creado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tickets-grid-body">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ASSIGNMENT / ROUND-ROBIN (HU-002) ═══ -->
+        <div id="view-assignment" class="view-container">
+          <div class="card">
+            <div class="card-header">
+              <h3>🔄 Motor de Asignación y Balanceo de Cargas (Round-Robin)</h3>
+              <span class="badge badge-open">REQ-05 · REQ-06 · RN002</span>
+            </div>
+            <div class="card-body" id="assignment-agents-grid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SLA MONITOR (HU-003) ═══ -->
+        <div id="view-sla" class="view-container">
+          <div class="card">
+            <div class="card-header">
+              <h3>⏱️ Monitor de Trazabilidad SLA — Semáforo en Tiempo Real</h3>
+              <span class="badge badge-open">REQ-07 · REQ-08 · REQ-09 · RN003 · RN005 · RN006</span>
+            </div>
+            <div class="card-body no-padding">
+              <div style="overflow-x:auto">
+                <table class="data-grid">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Asunto</th>
+                      <th>Estado</th>
+                      <th>SLA %</th>
+                      <th>Semáforo</th>
+                      <th>Tiempo</th>
+                      <th>Agente</th>
+                      <th>1ª Resp.</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sla-monitor-body">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BATCH CLOSURE (HU-005) ═══ -->
+        <div id="view-batch" class="view-container">
+          <div id="batch-content">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div><!-- /page-content -->
+    </main>
+
+    <!-- Ticket Detail Slide Panel -->
+    <div class="ticket-detail-panel" id="ticket-detail-panel"></div>
+
+  </div><!-- /app-shell -->
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/roundrobin.js"></script>
+  <script src="js/sla.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
